@@ -37,3 +37,9 @@ variable "deploy_firewall" {
   type        = bool
   default     = false
 }
+
+variable "deploy_resource_group" {
+  description = "Whether to deploy the resource group"
+  type        = bool
+  default     = false
+}

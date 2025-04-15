@@ -41,7 +41,7 @@ module "resource_group" {
     environment = var.environment
   }
 
-  count = var.deploy_rg ? 1 : 0
+  count = var.deploy_resource_group ? 1 : 0 // Use the variable here
 }
 
 # Conditionally create virtual network
