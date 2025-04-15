@@ -1,22 +1,39 @@
 variable "environment" {
-  description = "Environment name"
+  description = "The environment (e.g., dev, prod)"
   type        = string
 }
 
 variable "location" {
-  description = "Azure region"
+  description = "The Azure region to deploy resources"
   type        = string
 }
 
-# Feature flags for conditional deployment
+variable "vnet_address_space" {
+  description = "The address space for the virtual network"
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
+}
+
 variable "deploy_rg" {
-  type    = bool
-  default = false
+  description = "Whether to deploy the resource group"
+  type        = bool
+  default     = false
 }
 
 variable "deploy_vnet" {
-  type    = bool
-  default = false
+  description = "Whether to deploy the virtual network"
+  type        = bool
+  default     = false
 }
 
-# Add more flags like deploy_vm, deploy_aks etc.
+variable "deploy_vmss" {
+  description = "Whether to deploy the VM scale set"
+  type        = bool
+  default     = false
+}
+
+variable "deploy_firewall" {
+  description = "Whether to deploy the firewall"
+  type        = bool
+  default     = false
+}
