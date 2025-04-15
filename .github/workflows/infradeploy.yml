@@ -1,4 +1,4 @@
-name: Terraform Deployment
+name: Terraform Building Block Deployment
 
 on:
   workflow_dispatch:
