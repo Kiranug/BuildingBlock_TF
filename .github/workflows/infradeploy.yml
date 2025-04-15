@@ -1,0 +1,138 @@
+name: Terraform Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+      deploy_resource_group:
+        description: 'Deploy Resource Group'
+        required: false
+        default: false
+        type: boolean
+      deploy_vnet:
+        description: 'Deploy Virtual Network'
+        required: false
+        default: false
+        type: boolean
+      deploy_vmss:
+        description: 'Deploy VMSS'
+        required: false
+        default: false
+        type: boolean
+      deploy_firewall:
+        description: 'Deploy Azure Firewall'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: 1.5.0
+  TF_IN_AUTOMATION: true
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  BACKEND_RG: ${{ secrets.TFSTATE_RESOURCE_GROUP }}
+  BACKEND_STORAGE: ${{ secrets.TFSTATE_STORAGE_ACCOUNT }}
+  BACKEND_CONTAINER: ${{ secrets.TFSTATE_CONTAINER }}
+  ARM_USE_OIDC: true
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    if: ${{ github.event.inputs.action == 'plan' || github.event.inputs.action == 'apply' }}
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.BACKEND_RG }}" \
+            -backend-config="storage_account_name=${{ env.BACKEND_STORAGE }}" \
+            -backend-config="container_name=${{ env.BACKEND_CONTAINER }}" \
+            -backend-config="key=terraform.${{ github.event.inputs.environment }}.tfstate"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan \
+          -var="deploy_resource_group=${{ github.event.inputs.deploy_resource_group }}" \
+          -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
+          -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
+          -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
+          -var-file="${{ github.event.inputs.environment }}.tfvars"
+
+  terraform-apply:
+    name: Terraform Apply (with Approval)
+    if: ${{ github.event.inputs.action == 'apply' }}
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    environment: prod-approval
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.BACKEND_RG }}" \
+            -backend-config="storage_account_name=${{ env.BACKEND_STORAGE }}" \
+            -backend-config="container_name=${{ env.BACKEND_CONTAINER }}" \
+            -backend-config="key=terraform.${{ github.event.inputs.environment }}.tfstate"
+
+      - name: Terraform Apply
+        run: terraform apply \
+          -var="deploy_resource_group=${{ github.event.inputs.deploy_resource_group }}" \
+          -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
+          -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
+          -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
+          -var-file="${{ github.event.inputs.environment }}.tfvars" \
+          -auto-approve
