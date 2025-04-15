@@ -1,3 +1,5 @@
-environment         = "dev"
-resource_group_name = "rg-dev"
-location            = "East US"
+environment = "dev"
+location    = "eastus"
+deploy_rg   = true
+deploy_vnet = false
+# deploy_vm = true
