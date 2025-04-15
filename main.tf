@@ -43,14 +43,3 @@ module "resource_group" {
 
   count = var.deploy_rg ? 1 : 0
 }
-
-# Conditionally create VNet
-module "vnet" {
-  source              = "./modules/vnet"
-  name                = local.vnet_name
-  location            = var.location
-  resource_group_name = module.resource_group[0].name
-  depends_on          = [module.resource_group]
-
-  count = var.deploy_vnet ? 1 : 0
-}
