@@ -1,17 +1,22 @@
 variable "environment" {
-  description = "The deployment environment (dev, prod)"
+  description = "Environment name"
   type        = string
 }
 
 variable "location" {
-  description = "The Azure region to deploy to"
-  type        = string
-  default     = "East US"
-}
-
-variable "resource_group_name" {
-  description = "The name of the resource group"
+  description = "Azure region"
   type        = string
 }
 
-# Add more variables as needed
+# Feature flags for conditional deployment
+variable "deploy_rg" {
+  type    = bool
+  default = false
+}
+
+variable "deploy_vnet" {
+  type    = bool
+  default = false
+}
+
+# Add more flags like deploy_vm, deploy_aks etc.
