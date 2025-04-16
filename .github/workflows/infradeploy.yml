@@ -39,6 +39,10 @@ on:
         required: false
         default: false
         type: boolean
+      existing_resource_group_name:
+        description: 'Existing Resource Group name (used when deploy_resource_group=false)'
+        required: false
+        default: ''
 
 permissions:
   id-token: write
@@ -96,6 +100,7 @@ jobs:
             -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
             -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
             -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
+            -var="existing_resource_group_name=${{ github.event.inputs.existing_resource_group_name }}" \
             -var-file="${{ github.event.inputs.environment }}.tfvars"
 
       - name: Terraform Apply
@@ -106,5 +111,6 @@ jobs:
             -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
             -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
             -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
+            -var="existing_resource_group_name=${{ github.event.inputs.existing_resource_group_name }}" \
             -var-file="${{ github.event.inputs.environment }}.tfvars" \
             -auto-approve

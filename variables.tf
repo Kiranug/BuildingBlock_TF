@@ -43,3 +43,9 @@ variable "deploy_resource_group" {
   type        = bool
   default     = false
 }
+
+variable "existing_resource_group_name" {
+  description = "Name of existing resource group (used when not deploying RG)"
+  type        = string
+  default     = ""
+}
