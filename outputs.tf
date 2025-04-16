@@ -1,8 +1,19 @@
-output "resource_group_name" {
-  value       = var.deploy_resource_group ? module.resource_group[0].name : null
-  description = "Name of the deployed resource group, if created"
+output "vnet_name" {
+  description = "The name of the virtual network"
+  value       = module.vnet.vnet_name
 }
-output "resource_group_location" {
-  value       = var.deploy_resource_group ? module.resource_group[0].location : null
-  description = "Location of the deployed resource group, if created"
+
+output "vnet_id" {
+  description = "The ID of the virtual network"
+  value       = module.vnet.vnet_id
+}
+
+output "subnet_names" {
+  description = "The names of the subnets"
+  value       = module.vnet.subnet_names
+}
+
+output "subnet_ids" {
+  description = "The IDs of the subnets"
+  value       = module.vnet.subnet_ids
 }

@@ -8,44 +8,33 @@ variable "location" {
   type        = string
 }
 
+variable "resource_group_name" {
+  description = "Name of the resource group"
+  type        = string
+}
+
+variable "vnet_name" {
+  description = "Name of the virtual network"
+  type        = string
+}
+
 variable "vnet_address_space" {
   description = "The address space for the virtual network"
   type        = list(string)
-  default     = ["10.0.0.0/16"]
 }
 
-variable "deploy_rg" {
-  description = "Whether to deploy the resource group"
-  type        = bool
-  default     = false
+variable "subnet_names" {
+  description = "List of subnet names"
+  type        = list(string)
 }
 
-variable "deploy_vnet" {
-  description = "Whether to deploy the virtual network"
-  type        = bool
-  default     = false
+variable "subnet_prefixes" {
+  description = "List of subnet address prefixes"
+  type        = list(string)
 }
 
-variable "deploy_vmss" {
-  description = "Whether to deploy the VM scale set"
-  type        = bool
-  default     = false
-}
-
-variable "deploy_firewall" {
-  description = "Whether to deploy the firewall"
-  type        = bool
-  default     = false
-}
-
-variable "deploy_resource_group" {
-  description = "Whether to deploy the resource group"
-  type        = bool
-  default     = false
-}
-
-variable "existing_resource_group_name" {
-  description = "Name of existing resource group (used when not deploying RG)"
-  type        = string
-  default     = ""
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
 }

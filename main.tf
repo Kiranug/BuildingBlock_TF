@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.1"
-    }
   }
 
   backend "azurerm" {}
@@ -17,63 +13,44 @@ provider "azurerm" {
   features {}
 }
 
-provider "random" {}
-
-resource "random_id" "common" {
-  byte_length = 2
-}
-
-locals {
-  suffix = random_id.common.hex
-
-  resource_group_name = "${var.environment}-${var.location}-rg-${local.suffix}"
-  vnet_name           = "${var.environment}-${var.location}-vnet-${local.suffix}"
-  storage_name        = lower("st${local.suffix}")
-
-  effective_rg_name = var.deploy_resource_group ? module.resource_group[0].name : var.existing_resource_group_name
-}
-
-# Conditionally create resource group
+# Resource Group
 module "resource_group" {
   source   = "./modules/resource_group"
-  name     = local.resource_group_name
+  name     = var.resource_group_name
   location = var.location
   tags = {
     environment = var.environment
   }
-
-  count = var.deploy_resource_group ? 1 : 0
 }
 
-# Conditionally create virtual network
+# Virtual Network
 module "vnet" {
-  source   = "./modules/vnet"
-  name     = local.vnet_name
-  location = var.location
-  resource_group_name = local.effective_rg_name
+  source              = "./modules/vnet"
+  name                = var.vnet_name
+  location            = var.location
+  resource_group_name = module.resource_group.name
   address_space       = var.vnet_address_space
-
-  count = var.deploy_vnet ? 1 : 0
+  subnet_names        = var.subnet_names
+  subnet_prefixes     = var.subnet_prefixes
+  tags = {
+    environment = var.environment
+  }
 }
 
-# # Conditionally create VM scale set
+# # VM Scale Set
 # module "vmss" {
-#   source   = "./modules/vmss"
-#   name     = "${var.environment}-${var.location}-vmss-${local.suffix}"
-#   location = var.location
-#   resource_group_name = local.effective_rg_name
-#   subnet_id           = module.vnet[0].subnet_id
-
-#   count = var.deploy_vmss ? 1 : 0
+#   source              = "./modules/vmss"
+#   name                = var.vmss_name
+#   location            = var.location
+#   resource_group_name = module.resource_group.name
+#   subnet_id           = module.vnet.subnet_id
 # }
 
-# # Conditionally create firewall
+# # Azure Firewall
 # module "firewall" {
-#   source   = "./modules/firewall"
-#   name     = "${var.environment}-${var.location}-fw-${local.suffix}"
-#   location = var.location
-#   resource_group_name = local.effective_rg_name
-#   subnet_id           = module.vnet[0].subnet_id
-
-#   count = var.deploy_firewall ? 1 : 0
+#   source              = "./modules/firewall"
+#   name                = var.firewall_name
+#   location            = var.location
+#   resource_group_name = module.resource_group.name
+#   subnet_id           = module.vnet.subnet_id
 # }
