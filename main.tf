@@ -49,7 +49,7 @@ module "vnet" {
   source   = "./modules/vnet"
   name     = local.vnet_name
   location = var.location
-  resource_group_name = module.resource_group[0].name
+  resource_group_name = module.resource_group.name
   address_space       = var.vnet_address_space
 
   count = var.deploy_vnet ? 1 : 0
