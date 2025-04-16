@@ -80,5 +80,9 @@ jobs:
           
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
+        environment:
+          name: destroy-approval
+          url: https://portal.azure.com/
         run: |
-          terraform destroy -var-file="${{ github.event.inputs.environment }}.tfvars"
+          terraform destroy -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve
+
