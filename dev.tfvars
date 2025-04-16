@@ -1,7 +1,6 @@
 environment           = "dev"
 location              = "eastus"
 resource_group_name   = "dev-eastus-rg"
-vnet_address_space    = ["10.0.0.0/16"]
 vmss_name             = "dev-eastus-vmss"
 firewall_name         = "dev-eastus-fw"
 vnet_name          = "dev-eastus-vnet"
