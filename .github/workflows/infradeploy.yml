@@ -78,11 +78,35 @@ jobs:
         run: |
           terraform apply -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve
           
-      - name: Terraform Destroy
-        if: github.event.inputs.action == 'destroy'
-        environment:
-          name: destroy-approval
-          url: https://portal.azure.com/
-        run: |
-          terraform destroy -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve
+  terraform-destroy:
+    if: ${{ github.event.inputs.action == 'destroy' }}
+    environment:
+      name: destroy-approval
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with OIDC
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.BACKEND_RG }}" \
+            -backend-config="storage_account_name=${{ env.BACKEND_STORAGE }}" \
+            -backend-config="container_name=${{ env.BACKEND_CONTAINER }}" \
+            -backend-config="key=terraform.${{ github.event.inputs.environment }}.tfstate"
+
+      - name: Terraform Destroy
+        run: terraform destroy -var-file=${{ github.event.inputs.environment }}.tfvars -auto-approve
