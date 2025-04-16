@@ -1,4 +1,4 @@
-name: Terraform Building Block Deployment
+name: Terraform Deployment
 
 on:
   workflow_dispatch:
@@ -19,30 +19,6 @@ on:
         options:
           - plan
           - apply
-      deploy_resource_group:
-        description: 'Deploy Resource Group'
-        required: false
-        default: false
-        type: boolean
-      deploy_vnet:
-        description: 'Deploy Virtual Network'
-        required: false
-        default: false
-        type: boolean
-      deploy_vmss:
-        description: 'Deploy VMSS'
-        required: false
-        default: false
-        type: boolean
-      deploy_firewall:
-        description: 'Deploy Azure Firewall'
-        required: false
-        default: false
-        type: boolean
-      existing_resource_group_name:
-        description: 'Existing Resource Group name (used when deploy_resource_group=false)'
-        required: false
-        default: ''
 
 permissions:
   id-token: write
@@ -61,15 +37,14 @@ env:
 
 jobs:
   terraform:
-    name: Terraform Plan/Apply
+    name: Terraform Plan or Apply
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.action == 'apply' && github.event.inputs.environment == 'prod' && 'prod-approval' || '' }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Azure Login with OIDC
+      - name: Azure Login using OIDC
         uses: azure/login@v1
         with:
           client-id: ${{ env.ARM_CLIENT_ID }}
@@ -95,22 +70,9 @@ jobs:
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
         run: |
-          terraform plan \
-            -var="deploy_resource_group=${{ github.event.inputs.deploy_resource_group }}" \
-            -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
-            -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
-            -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
-            -var="existing_resource_group_name=${{ github.event.inputs.existing_resource_group_name }}" \
-            -var-file="${{ github.event.inputs.environment }}.tfvars"
+          terraform plan -var-file="${{ github.event.inputs.environment }}.tfvars"
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         run: |
-          terraform apply \
-            -var="deploy_resource_group=${{ github.event.inputs.deploy_resource_group }}" \
-            -var="deploy_vnet=${{ github.event.inputs.deploy_vnet }}" \
-            -var="deploy_vmss=${{ github.event.inputs.deploy_vmss }}" \
-            -var="deploy_firewall=${{ github.event.inputs.deploy_firewall }}" \
-            -var="existing_resource_group_name=${{ github.event.inputs.existing_resource_group_name }}" \
-            -var-file="${{ github.event.inputs.environment }}.tfvars" \
-            -auto-approve
+          terraform apply -var-file="${{ github.event.inputs.environment }}.tfvars" -auto-approve
