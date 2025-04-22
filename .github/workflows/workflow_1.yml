@@ -1,3 +1,5 @@
+# Terraform GitHub Actions Workflow for Azure OIDC Authentication 
+# This workflow automates the deployment of Terraform infrastructure using GitHub Actions.
 name: Deploy to Azure
 
 on:
