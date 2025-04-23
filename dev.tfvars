@@ -12,4 +12,4 @@ dns_prefix          = "aksfree"
 node_count          = 1
 vm_size             = "Standard_B2s"
 sku_tier            = "Free"
-acr_name            = "myacrdevops"
+acr_name            = "jubbuseacrinmh"
