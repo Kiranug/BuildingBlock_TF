@@ -45,16 +45,7 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
-      - name: Login to Azure using Workload Identity
-        uses: azure/login@v1
-        with:
-          enable-AzPSSession: false
-          environment: azurecloud
-          allow-no-subscriptions: false
-          audience: api://AzureADTokenExchange  # Ensure this matches your federated identity
-          auth-type: workload-identity
-          federated-identity-client-id: ${{ secrets.AZURE_FEDERATED_IDENTITY_CLIENT_ID }}  # Set in GitHub Secrets
+          # Set in GitHub Secrets
 
       - name: Run az command
         run: az group list
