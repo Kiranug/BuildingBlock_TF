@@ -45,3 +45,9 @@ variable "dns_prefix" {}
 variable "node_count" {}
 variable "vm_size" {}
 variable "sku_tier" {}
+
+variable "acr_name" {
+  description = "Name of the Azure Container Registry"
+  type        = string  
+  
+}

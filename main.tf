@@ -35,6 +35,14 @@ module "aks" {
   sku_tier            = var.sku_tier
 }
 
+module "acr" {
+  source                = "./modules/acr"
+  acr_name              = var.acr_name
+  resource_group_name   = var.resource_group_name
+  location              = var.location
+  aks_kubelet_identity_id = module.aks.kubelet_identity_id
+}
+
 
 # # Virtual Network
 # module "vnet" {
