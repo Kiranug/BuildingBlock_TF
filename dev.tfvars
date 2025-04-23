@@ -1,13 +1,12 @@
 environment           = "dev"
 location              = "eastus"
-resource_group_name   = "dev-eastus-rg"
+resource_group_name   = "rg-aks-free-tier"
 vmss_name             = "dev-eastus-vmss"
 firewall_name         = "dev-eastus-fw"
 vnet_name          = "dev-eastus-vnet"
 vnet_address_space = ["10.0.0.0/16"]
 subnet_names       = ["subnet1", "subnet2", "subnet3"]
 subnet_prefixes    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-resource_group_name_aks = "rg-aks-free-tier"
 cluster_name        = "aks-free-cluster"
 dns_prefix          = "aksfree"
 node_count          = 1
