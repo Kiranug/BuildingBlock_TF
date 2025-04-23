@@ -44,6 +44,12 @@ module "acr" {
 }
 
 
+module "nginx_ingress" {
+  source            = "./modules/ingress"
+  namespace         = "ingress-basic"
+  load_balancer_ip  = "" # Optional: static IP
+}
+
 # # Virtual Network
 # module "vnet" {
 #   source              = "./modules/vnet"
