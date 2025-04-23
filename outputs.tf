@@ -17,3 +17,8 @@ output "subnet_ids" {
 output "resource_group_name" {
   value = module.resource_group.name  
 }
+
+output "kube_config" {
+  value     = module.aks.kube_config
+  sensitive = true
+}

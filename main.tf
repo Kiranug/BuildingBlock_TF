@@ -23,6 +23,19 @@ module "resource_group" {
   }
 }
 
+
+module "aks" {
+  source              = "./modules/aks"
+  resource_group_name = var.resource_group_name_aks
+  location            = var.location
+  cluster_name        = var.cluster_name
+  dns_prefix          = var.dns_prefix
+  node_count          = var.node_count
+  vm_size             = var.vm_size
+  sku_tier            = var.sku_tier
+}
+
+
 # Virtual Network
 module "vnet" {
   source              = "./modules/vnet"
