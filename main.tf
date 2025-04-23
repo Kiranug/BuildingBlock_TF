@@ -36,19 +36,19 @@ module "aks" {
 }
 
 
-# Virtual Network
-module "vnet" {
-  source              = "./modules/vnet"
-  name                = var.vnet_name
-  location            = var.location
-  resource_group_name = module.resource_group.name
-  address_space       = var.vnet_address_space
-  subnet_names        = var.subnet_names
-  subnet_prefixes     = var.subnet_prefixes
-  tags = {
-    environment = var.environment
-  }
-}
+# # Virtual Network
+# module "vnet" {
+#   source              = "./modules/vnet"
+#   name                = var.vnet_name
+#   location            = var.location
+#   resource_group_name = module.resource_group.name
+#   address_space       = var.vnet_address_space
+#   subnet_names        = var.subnet_names
+#   subnet_prefixes     = var.subnet_prefixes
+#   tags = {
+#     environment = var.environment
+#   }
+# }
 
 # # VM Scale Set
 # module "vmss" {
